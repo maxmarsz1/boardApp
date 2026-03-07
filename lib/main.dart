@@ -1,6 +1,5 @@
 import 'package:board_app/ui/board/providers/bluetooth_provider.dart';
 import 'package:board_app/ui/board/providers/board_provider.dart';
-import 'package:board_app/ui/board/view_models/bluetooth_model.dart';
 import 'package:board_app/ui/board/widgets/board_random.dart';
 import 'package:board_app/ui/core/ui/app_bottom_navigation_bar.dart';
 import 'package:board_app/ui/core/ui/themes/default_theme.dart';
@@ -160,12 +159,14 @@ class BluetoothScanButton extends StatelessWidget {
       margin: EdgeInsets.all(10),
       alignment: const Alignment(0, 1),
       child: ElevatedButton(
-        onPressed: context.read<BluetoothProvider>().isScanning()
-            ? null
-            : context.read<BluetoothProvider>().toggleScan,
+        onPressed: 
+        // context.read<BluetoothProvider>().isScanning()
+        //     ? null
+        //     : 
+            context.read<BluetoothProvider>().toggleScan,
         child: Text(
           context.watch<BluetoothProvider>().isScanning()
-              ? "Searching..."
+              ? "Stop"
               : "Search devices",
         ),
       ),
@@ -196,14 +197,15 @@ class BluetoothDeviceItem extends StatelessWidget {
         ),
         child: Padding(
           padding: const EdgeInsets.all(10),
-          child: Text(
-            context.watch<BluetoothProvider>().getScannedDevices()[index],
-          ),
+          child: context.watch<BluetoothProvider>().getScannedDevices()[index].advName == "" ?
+            Text(context.watch<BluetoothProvider>().getScannedDevices()[index].remoteId.str) :
+            Text(context.watch<BluetoothProvider>().getScannedDevices()[index].advName)
         ),
         onPressed: () {
           print(
             "Connecting to ${context.read<BluetoothProvider>().getScannedDevices()[index]}",
           );
+          context.read<BluetoothProvider>().connect();
         },
       ),
     );
