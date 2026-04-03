@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:board_app/ui/board/view_models/bluetooth_model.dart';
@@ -28,7 +29,7 @@ class BluetoothProvider extends ChangeNotifier {
       return;
     }
 
-    if (bluetoothModel.getSubscription == null) {
+    if (bluetoothModel.subscription == null) {
       bluetoothModel.clearScannedDevices();
       setSubscription();
     } else {
@@ -44,7 +45,41 @@ class BluetoothProvider extends ChangeNotifier {
     }
   }
   
-  void connect(){
+  void connect(BluetoothDevice device) async {
+    var subscription = device.connectionState.listen((BluetoothConnectionState state) async {
+    if (state == BluetoothConnectionState.disconnected) {
+        // 1. typically, start a periodic timer that tries to 
+        //    reconnect, or just call connect() again right now
+        // 2. you must always re-discover services after disconnection!
+
+        changeStatus(BluetoothStatus.disconnected);
+        print("${device.disconnectReason?.code} ${device.disconnectReason?.description}");
+      }
+    });
+
+    // cleanup: cancel subscription when disconnected
+    //   - [delayed] This option is only meant for `connectionState` subscriptions.  
+    //     When `true`, we cancel after a small delay. This ensures the `connectionState` 
+    //     listener receives the `disconnected` event.
+    //   - [next] if true, the the stream will be canceled only on the *next* disconnection,
+    //     not the current disconnection. This is useful if you setup your subscriptions
+    //     before you connect.
+    device.cancelWhenDisconnected(subscription, delayed:true, next:true);
+    await device.connect(license: License.free);
+
+    List<BluetoothService> services = await device.discoverServices();
+    services.forEach((service) async {
+      // print(service);
+      var characteristics = service.characteristics;
+      for(BluetoothCharacteristic c in characteristics) {
+        if(c.uuid.str == "77fb628a-5f65-4c9d-aacc-73f499bae991"){
+          bluetoothModel.controlCharacteristic = c;
+          // print("Found characteristic");
+          // c.write([0x33]);
+        }
+      }
+    });
+
     changeStatus(BluetoothStatus.connected);
     notifyListeners();
   }
@@ -53,7 +88,7 @@ class BluetoothProvider extends ChangeNotifier {
     bluetoothModel.setSubscription = FlutterBluePlus.adapterState.listen((
       BluetoothAdapterState state,
     ) async {
-      print("State: ${state}");
+      print("State: $state");
       if (state == BluetoothAdapterState.on) {
         bluetoothModel.changeStatus(
           isScanning()
@@ -105,6 +140,15 @@ class BluetoothProvider extends ChangeNotifier {
 
   List<BluetoothDevice> getScannedDevices() {
     return bluetoothModel.scannedDevices;
+  }
+
+  void lightBoard(List<int> routeLayoutBytes){
+    sendBytes(routeLayoutBytes);
+  }
+
+  void sendBytes(List<int> bytes){
+    BluetoothCharacteristic characteristic = bluetoothModel.controlCharacteristic;
+    characteristic.write(bytes);
   }
 
   Icon getBluetoothIcon() {

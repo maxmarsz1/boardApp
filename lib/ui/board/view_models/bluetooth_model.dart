@@ -1,5 +1,6 @@
 
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
@@ -9,16 +10,26 @@ class BluetoothModel {
   BluetoothStatus status = BluetoothStatus.off;
   StreamSubscription<BluetoothAdapterState>? _subscription;
   List<BluetoothDevice> scannedDevices = [];
+  BluetoothDevice? _connectedDevice;
+  BluetoothCharacteristic? _controlCharacteristic;
 
-  void changeStatus(BluetoothStatus newStatus){
-    status = newStatus;
-  }
+  get connectedDevice => _connectedDevice;
+  get controlCharacteristic => _controlCharacteristic;
+  get subscription => _subscription;
 
   set setSubscription(StreamSubscription<BluetoothAdapterState>? s){
     _subscription = s;
   }
-  
-  get getSubscription => _subscription;
+  set connectedDevice(BluetoothDevice connectedDevice){
+    _connectedDevice = connectedDevice;
+  }
+  set controlCharacteristic(BluetoothCharacteristic controlCharacteristic){
+    _controlCharacteristic = controlCharacteristic;
+  }
+
+  void changeStatus(BluetoothStatus newStatus){
+    status = newStatus;
+  }
 
   void newScannedDevice(BluetoothDevice newDevice){
     if(!scannedDevices.contains(newDevice)){
@@ -29,6 +40,7 @@ class BluetoothModel {
   void clearScannedDevices(){
     scannedDevices = [];
   }
+
 
   BluetoothModel();
 }

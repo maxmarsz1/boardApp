@@ -4,6 +4,7 @@ import 'package:board_app/ui/board/widgets/board_random.dart';
 import 'package:board_app/ui/core/ui/app_bottom_navigation_bar.dart';
 import 'package:board_app/ui/core/ui/themes/default_theme.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -28,7 +29,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   int _selectedIndex = 0;
   final List<Widget> _pages = [
-    BoardRandom(cols: 10, rows: 13),
+    BoardRandom(cols: 8, rows: 8),
     Icon(Icons.abc),
     Icon(Icons.person),
   ];
@@ -202,10 +203,11 @@ class BluetoothDeviceItem extends StatelessWidget {
             Text(context.watch<BluetoothProvider>().getScannedDevices()[index].advName)
         ),
         onPressed: () {
+          BluetoothDevice device = context.read<BluetoothProvider>().getScannedDevices()[index];
           print(
-            "Connecting to ${context.read<BluetoothProvider>().getScannedDevices()[index]}",
+            "Connecting to $device",
           );
-          context.read<BluetoothProvider>().connect();
+          context.read<BluetoothProvider>().connect(device);
         },
       ),
     );

@@ -22,6 +22,4 @@ class BoardProvider extends ChangeNotifier{
     _routeModel = RouteModel.fromJson({});
     notifyListeners();
   }
-
-
 }

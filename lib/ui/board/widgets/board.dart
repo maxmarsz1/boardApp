@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:board_app/ui/board/providers/bluetooth_provider.dart';
 import 'package:board_app/ui/board/providers/board_provider.dart';
 import 'package:board_app/ui/board/view_models/route_model.dart';
 import 'package:board_app/ui/board/widgets/hold.dart';
@@ -35,7 +36,7 @@ class _BoardState extends State<Board> {
     final board = context.read<BoardProvider>();
     try {
       final RouteModel test = RouteModel.fromJson(
-        jsonDecode('{"all": [1,2,3], "feet": [89, 97], "start": [66, 78]}'),
+        jsonDecode('{"all": [1,2,3], "feet": [33, 42], "start": [12, 13]}'),
       );
       board.changeRoute(test);
     } catch (e) {
@@ -102,8 +103,8 @@ class _BoardState extends State<Board> {
                 child: Text("Load route"),
               ),
               ElevatedButton(
-                onPressed: () => {},
-                child: Text("Save route (todo)"),
+                onPressed: () => {context.read<BluetoothProvider>().lightBoard(context.read<BoardProvider>().route.getRouteLayoutBytes())},
+                child: Text("Light board"),
               ),
               ElevatedButton(
                 onPressed: () => context.read<BoardProvider>().clearRoute(),

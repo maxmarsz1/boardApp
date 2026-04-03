@@ -7,6 +7,7 @@ class RouteModel {
   RouteModel(this._holdStates);
 
   factory RouteModel.fromJson(Map<String, dynamic> json) {
+
     final Map<HoldType, List<int>> holdStates = {};
     const Map<String, HoldType> holdTypeNames = {
       'all': HoldType.all,
@@ -59,6 +60,21 @@ class RouteModel {
       }
       _holdStates[nextHoldType]!.add(idx);
     }
+  }
+
+  List<int> getRouteLayoutBytes(){
+    List<int> routeLayoutBytes = List.filled(8*8, 48);
+    for(HoldType type in _holdStates.keys){
+      if(_holdStates[type] != null){
+        List<int>? coords = _holdStates[type];
+        if(coords != null){
+          for(int coord in coords){
+            routeLayoutBytes[coord] = type.index + 48;
+          }
+        }
+      }
+    }
+    return routeLayoutBytes;
   }
 
   Map<HoldType, List<int>> getRoute(){
