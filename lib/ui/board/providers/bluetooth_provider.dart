@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:board_app/ui/board/view_models/bluetooth_model.dart';
@@ -15,6 +14,10 @@ class BluetoothProvider extends ChangeNotifier {
 
   bool isScanning() {
     return bluetoothModel.status == BluetoothStatus.scanning;
+  }
+
+  BluetoothDevice? getConnectedDevice(){
+    return bluetoothModel.connectedDevice;
   }
 
   void changeStatus(BluetoothStatus newStatus) {
@@ -53,6 +56,8 @@ class BluetoothProvider extends ChangeNotifier {
         // 2. you must always re-discover services after disconnection!
 
         changeStatus(BluetoothStatus.disconnected);
+        bluetoothModel.connectedDevice = null;
+        notifyListeners();
         print("${device.disconnectReason?.code} ${device.disconnectReason?.description}");
       }
     });
@@ -66,6 +71,7 @@ class BluetoothProvider extends ChangeNotifier {
     //     before you connect.
     device.cancelWhenDisconnected(subscription, delayed:true, next:true);
     await device.connect(license: License.free);
+    bluetoothModel.connectedDevice = device;
 
     List<BluetoothService> services = await device.discoverServices();
     services.forEach((service) async {
@@ -138,8 +144,9 @@ class BluetoothProvider extends ChangeNotifier {
     });
   }
 
-  List<BluetoothDevice> getScannedDevices() {
-    return bluetoothModel.scannedDevices;
+  List<BluetoothDevice> getScannedFilteredDevices() {
+    List<BluetoothDevice> filteredDevices = bluetoothModel.scannedDevices.where((device) => device.advName == "Board67").toList();
+    return filteredDevices;
   }
 
   void lightBoard(List<int> routeLayoutBytes){

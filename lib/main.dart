@@ -101,7 +101,7 @@ class BluetoothModal extends StatelessWidget {
     return SafeArea(
       child: SizedBox(
         width: 1050,
-        height: 800,
+        height: 300,
 
         child: Column(
           children: [
@@ -128,19 +128,33 @@ class BluetoothDevicesList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    BluetoothDevice? connectedDevice = context.watch<BluetoothProvider>().getConnectedDevice();
+    List<BluetoothDevice> scannedDevices = context.watch<BluetoothProvider>().getScannedFilteredDevices();
+    print(connectedDevice != null && !scannedDevices.contains(connectedDevice));
+    // print();
+
     return Expanded(
       child: Stack(
         children: [
           Container(
             color: Color.fromARGB(255, 22, 22, 22),
-            child: ListView.builder(
-              itemCount: context
-                  .watch<BluetoothProvider>()
-                  .getScannedDevices()
-                  .length,
-              itemBuilder: (context, index) {
-                return BluetoothDeviceItem(index: index);
-              },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if(connectedDevice != null && !scannedDevices.contains(connectedDevice))
+                  BluetoothDeviceItem(device: connectedDevice),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: context
+                        .watch<BluetoothProvider>()
+                        .getScannedFilteredDevices()
+                        .length,
+                    itemBuilder: (context, index) {
+                      return BluetoothDeviceItem(device: context.watch<BluetoothProvider>().getScannedFilteredDevices()[index],);
+                    },
+                  ),
+                ),
+              ],
             ),
           ),
 
@@ -176,9 +190,9 @@ class BluetoothScanButton extends StatelessWidget {
 }
 
 class BluetoothDeviceItem extends StatelessWidget {
-  const BluetoothDeviceItem({super.key, required this.index});
+  const BluetoothDeviceItem({super.key, required this.device});
 
-  final int index;
+  final BluetoothDevice device;
 
   @override
   Widget build(BuildContext context) {
@@ -197,13 +211,21 @@ class BluetoothDeviceItem extends StatelessWidget {
           foregroundColor: Colors.white,
         ),
         child: Padding(
-          padding: const EdgeInsets.all(10),
-          child: context.watch<BluetoothProvider>().getScannedDevices()[index].advName == "" ?
-            Text(context.watch<BluetoothProvider>().getScannedDevices()[index].remoteId.str) :
-            Text(context.watch<BluetoothProvider>().getScannedDevices()[index].advName)
+          padding: const EdgeInsets.fromLTRB(10, 15, 10, 15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              device.advName == "" ?
+              Text(device.remoteId.str, style: TextStyle(fontSize: 16),) :
+              Text(device.advName, style: TextStyle(fontSize: 16),),
+
+              Text(device == context.watch<BluetoothProvider>().getConnectedDevice() ? 
+              "Connected" : "Not connected", style: TextStyle(color: Color.from(alpha: 1, red: .6, green: .6, blue: .6)),),
+              
+            ],
+          )
         ),
         onPressed: () {
-          BluetoothDevice device = context.read<BluetoothProvider>().getScannedDevices()[index];
           print(
             "Connecting to $device",
           );
