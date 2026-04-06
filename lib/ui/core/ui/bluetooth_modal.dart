@@ -156,7 +156,6 @@ class BluetoothDeviceItem extends StatelessWidget {
               ));
             }
           }
-          
         },
       ),
     );
