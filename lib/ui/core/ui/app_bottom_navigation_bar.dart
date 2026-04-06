@@ -10,12 +10,12 @@ class AppBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: "Board"),
+        BottomNavigationBarItem(icon: Icon(Icons.grid_view_rounded), label: "Board"),
         BottomNavigationBarItem(
-          icon: Icon(Icons.accessibility_new),
+          icon: Icon(Icons.show_chart_rounded),
           label: "Routes",
         ),
-        BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
+        BottomNavigationBarItem(icon: Icon(Icons.person_rounded), label: "Profile"),
       ],
       onTap: (idx) => onTap(idx),
       currentIndex: selectedIndex,
