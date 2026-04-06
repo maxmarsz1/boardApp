@@ -34,8 +34,6 @@ class _BoardRandomState extends State<BoardRandom> {
       );
   }
 
-
-
   @override
   void initState() {
     _holds = List.generate(

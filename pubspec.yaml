@@ -1,5 +1,5 @@
 name: board_app
-description: "A new Flutter project."
+description: "Board67 App that communicates with ESP32 controller to light routes."
 publish_to: 'none'
 version: 0.1.0
 
@@ -9,7 +9,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  interactive_viewer_2: ^0.1.0
   provider:
   flutter_blue_plus: ^2.2.1
 

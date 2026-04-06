@@ -12,7 +12,6 @@ class Hold extends StatelessWidget {
   // @override
   @override
   Widget build(BuildContext context) {
-
     return Container(
       transformAlignment: Alignment.center,
       transform: Matrix4.rotationZ((rotationAngle ?? 0) * (pi / 180)),

@@ -2,9 +2,9 @@ import 'package:board_app/ui/board/providers/bluetooth_provider.dart';
 import 'package:board_app/ui/board/providers/board_provider.dart';
 import 'package:board_app/ui/board/widgets/board_random.dart';
 import 'package:board_app/ui/core/ui/app_bottom_navigation_bar.dart';
+import 'package:board_app/ui/core/ui/bluetooth_modal.dart';
 import 'package:board_app/ui/core/ui/themes/default_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 import 'package:provider/provider.dart';
 
 void main() {
@@ -12,7 +12,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => BoardProvider()),
-        ChangeNotifierProvider(create: (context) => BluetoothProvider()),
+        ChangeNotifierProvider(create: (context) => BluetoothProvider(context)),
       ],
       child: const MainApp(),
     ),
@@ -89,149 +89,6 @@ class BoardAppBar extends StatelessWidget implements PreferredSizeWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-class BluetoothModal extends StatelessWidget {
-  const BluetoothModal({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return SafeArea(
-      child: SizedBox(
-        width: 1050,
-        height: 300,
-
-        child: Column(
-          children: [
-            SizedBox(height: 20),
-            Text(
-              "Bluetooth devices",
-              style: TextStyle(color: Colors.white, fontSize: 20),
-            ),
-            SizedBox(height: 20),
-            context.watch<BluetoothProvider>().isScanning()
-                ? LinearProgressIndicator()
-                : SizedBox(height: 4),
-
-            BluetoothDevicesList(),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class BluetoothDevicesList extends StatelessWidget {
-  const BluetoothDevicesList({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    BluetoothDevice? connectedDevice = context.watch<BluetoothProvider>().getConnectedDevice();
-    List<BluetoothDevice> scannedDevices = context.watch<BluetoothProvider>().getScannedFilteredDevices();
-    print(connectedDevice != null && !scannedDevices.contains(connectedDevice));
-    // print();
-
-    return Expanded(
-      child: Stack(
-        children: [
-          Container(
-            color: Color.fromARGB(255, 22, 22, 22),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if(connectedDevice != null && !scannedDevices.contains(connectedDevice))
-                  BluetoothDeviceItem(device: connectedDevice),
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: context
-                        .watch<BluetoothProvider>()
-                        .getScannedFilteredDevices()
-                        .length,
-                    itemBuilder: (context, index) {
-                      return BluetoothDeviceItem(device: context.watch<BluetoothProvider>().getScannedFilteredDevices()[index],);
-                    },
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          BluetoothScanButton(),
-        ],
-      ),
-    );
-  }
-}
-
-class BluetoothScanButton extends StatelessWidget {
-  const BluetoothScanButton({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(10),
-      alignment: const Alignment(0, 1),
-      child: ElevatedButton(
-        onPressed: 
-        // context.read<BluetoothProvider>().isScanning()
-        //     ? null
-        //     : 
-            context.read<BluetoothProvider>().toggleScan,
-        child: Text(
-          context.watch<BluetoothProvider>().isScanning()
-              ? "Stop"
-              : "Search devices",
-        ),
-      ),
-    );
-  }
-}
-
-class BluetoothDeviceItem extends StatelessWidget {
-  const BluetoothDeviceItem({super.key, required this.device});
-
-  final BluetoothDevice device;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: Color.fromARGB(255, 22, 22, 22), width: 1),
-        ),
-      ),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          alignment: Alignment.centerLeft,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.all(Radius.zero),
-          ),
-          foregroundColor: Colors.white,
-        ),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(10, 15, 10, 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              device.advName == "" ?
-              Text(device.remoteId.str, style: TextStyle(fontSize: 16),) :
-              Text(device.advName, style: TextStyle(fontSize: 16),),
-
-              Text(device == context.watch<BluetoothProvider>().getConnectedDevice() ? 
-              "Connected" : "Not connected", style: TextStyle(color: Color.from(alpha: 1, red: .6, green: .6, blue: .6)),),
-              
-            ],
-          )
-        ),
-        onPressed: () {
-          print(
-            "Connecting to $device",
-          );
-          context.read<BluetoothProvider>().connect(device);
-        },
-      ),
     );
   }
 }

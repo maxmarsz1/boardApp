@@ -103,7 +103,7 @@ class _BoardState extends State<Board> {
                 child: Text("Load route"),
               ),
               ElevatedButton(
-                onPressed: () => {context.read<BluetoothProvider>().lightBoard(context.read<BoardProvider>().route.getRouteLayoutBytes())},
+                onPressed: () => {context.read<BluetoothProvider>().lightBoard(context.read<BoardProvider>().route, context)},
                 child: Text("Light board"),
               ),
               ElevatedButton(

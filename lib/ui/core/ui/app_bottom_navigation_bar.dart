@@ -10,10 +10,10 @@ class AppBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return BottomNavigationBar(
       items: [
-        BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+        BottomNavigationBarItem(icon: Icon(Icons.home), label: "Board"),
         BottomNavigationBarItem(
           icon: Icon(Icons.accessibility_new),
-          label: "Climbs",
+          label: "Routes",
         ),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
       ],

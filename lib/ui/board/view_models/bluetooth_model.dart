@@ -3,21 +3,18 @@ import 'dart:async';
 
 import 'package:flutter_blue_plus/flutter_blue_plus.dart';
 
-enum BluetoothStatus {connected, scanning, off, disconnected}
+enum BluetoothStatus {connected, on, off}
 
 class BluetoothModel {
   BluetoothStatus status = BluetoothStatus.off;
-  StreamSubscription<BluetoothAdapterState>? _subscription;
+  StreamSubscription<BluetoothAdapterState>? adapterStateSubscription;
   List<BluetoothDevice> scannedDevices = [];
   BluetoothDevice? connectedDevice;
   BluetoothCharacteristic? _controlCharacteristic;
+  bool isScanning = false;
 
   get controlCharacteristic => _controlCharacteristic;
-  get subscription => _subscription;
 
-  set setSubscription(StreamSubscription<BluetoothAdapterState>? s){
-    _subscription = s;
-  }
   set controlCharacteristic(BluetoothCharacteristic controlCharacteristic){
     _controlCharacteristic = controlCharacteristic;
   }
